@@ -1,11 +1,13 @@
 import tkinter
-
+import pandas
 import requests
 from tkinter import *
 from bs4 import BeautifulSoup
 
+
 def close():
     win.destroy()
+
 
 def scrape():
     # URL of the page being scraped
@@ -50,36 +52,22 @@ def scrape():
 
 
 win = tkinter.Tk()  # creating the main window and storing the window object in 'win'
-win.geometry('500x200')  # setting the size of the window
+win.geometry('300x100')  # setting the size of the window
 win.title('Craigslist Scraper')
-player_name = Entry(win)
-player_name.pack(pady=30)
+
 Button(
     win,
     text="Scrape",
     padx=10,
     pady=5,
-    width=10,
-    height = 5,
     command=scrape
-).pack()
+).pack(pady=5)
+
 Button(
     win,
     text="Exit",
     padx=10,
     pady=5,
-    width=10,
-    height=5,
     command=close
-    ).pack()
+).pack(pady=5)
 win.mainloop()
-
-
-class Listing:
-    def init(self, vin, year, make, model, priceOfCar, listingDate):
-        self.listingDate = listingDate
-        self.priceOfCar = priceOfCar
-        self.model = model
-        self.make = make
-        self.year = year
-        self.vin = vin
