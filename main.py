@@ -7,6 +7,11 @@ from tkinter import *
 from bs4 import BeautifulSoup
 import pyperclip
 
+window_width = 504
+window_height = 200
+screensize = str(window_width) + 'x' + str(window_height)
+
+
 def close():
     win.destroy()
 
@@ -20,11 +25,11 @@ def scrape():
         if 300 <= r.status_code < 400:
             print(redirect)
             messagebox.showinfo(title="Redirect", message=redirect)
-            craigslistURL.delete(0,END)
-            craigslistURL.insert(0,requests.get(url).url)
+            craigslistURL.delete(0, END)
+            craigslistURL.insert(0, requests.get(url).url)
 
         elif r.status_code == 404:
-            messagebox.showerror(r.status_code,"Status Code: 404 Not Found \nCheck URL")
+            messagebox.showerror(r.status_code, "Status Code: 404 Not Found \nCheck URL")
         elif r.status_code == 429:
             print("Too many requests\n")
         elif r.status_code == 418:
@@ -77,11 +82,13 @@ def scrape():
 
 
     except:
-        craigslistURL.delete(0,END)
-        messagebox.showerror("Error","Invalid URL")
+        craigslistURL.delete(0, END)
+        messagebox.showerror("Error", "Invalid URL")
+
 
 def copy():
     pyperclip.copy(craigslistURL.get())
+
 
 baseURL = {'https://auburn.craigslist.org', 'https://bham.craigslist.org', 'https://dothan.craigslist.org',
            'https://shoals.craigslist.org', 'https://gadsden.craigslist.org', 'https://huntsville.craigslist.org',
@@ -231,47 +238,53 @@ baseURL = {'https://auburn.craigslist.org', 'https://bham.craigslist.org', 'http
            'https://micronesia.craigslist.org', 'https://puertorico.craigslist.org', 'https://virgin.craigslist.org'}
 
 win = tkinter.Tk()  # creating the main window and storing the window object in 'win'
-win.geometry('500x300')  # setting the size of the window
+win.geometry(screensize)  # setting the size of the window
 win.title('Craigslist Scraper')
 win.configure(bg='#8ed1fc')
 win.eval('tk::PlaceWindow . center')
+win.resizable(width=False, height=False)
 
 label = Label(win, font=('arial', 14, 'bold'), text='Enter a valid Craigslist URL from the "for sale" section')
-label.pack(pady=10)
+label.place(y=window_height / 10)
 label.configure(bg='#8ed1fc')
 
-craigslistURL = Entry(win, width=50)
-craigslistURL.pack(pady=10)
+craigslistURL = Entry(win, width=49, font=('Arial 10'))
+craigslistURL.place(relx=.5, rely=.45, height=37,anchor= CENTER)
 
-copy_button = PhotoImage(file='copy.png')
+copy_button_img = PhotoImage(file='copy.png')
 
-Button(
+scrape_button = Button(
     win,
-    text="Scrape",fg='white',
+    text="Scrape", fg='white',
     font=('arial', 10, 'bold'),
-    padx=10,
-    pady=5,
+    width=10,
+    height=1,
     command=scrape,
     cursor="spider",
-    background="black"
-).pack(pady=5)
+    background="black",
 
-Button(
+)
+scrape_button.place(relx=.5, rely=.7,anchor= CENTER)
+
+exit_button = Button(
     win,
     text="Exit", fg='white',
     font=('arial', 10, 'bold'),
-    padx=10,
-    pady=5,
+    width=10,
+    height=1,
     command=close,
     cursor="pirate",
     background="black"
-).pack(pady=5)
+)
 
-Button(
+exit_button.place(relx=.5, rely=.87,anchor= CENTER)
+
+copy_button = Button(
     win,
-    image=copy_button,
+    image=copy_button_img,
     command=copy,
     cursor="star"
-).pack(pady=5)
+)
+copy_button.place(relx=.885, rely=.45, height=37,anchor= CENTER)
 
 win.mainloop()
