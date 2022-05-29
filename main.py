@@ -5,7 +5,7 @@ import pandas
 import requests
 from tkinter import *
 from bs4 import BeautifulSoup
-
+import pyperclip
 
 def close():
     win.destroy()
@@ -15,13 +15,20 @@ def scrape():
     try:
         url = craigslistURL.get()
         r = requests.get(url, allow_redirects=False)
+        redirect = "Redirected to " + requests.get(url).url
         print("Status code:", r.status_code)
         if 300 <= r.status_code < 400:
-            print("Redirected to", requests.get(url).url)
+            print(redirect)
+            messagebox.showinfo(title="Redirect", message=redirect)
+            craigslistURL.delete(0,END)
+            craigslistURL.insert(0,requests.get(url).url)
+
         elif r.status_code == 404:
-            print("Page not found\n")
+            messagebox.showerror(r.status_code,"Status Code: 404 Not Found \nCheck URL")
         elif r.status_code == 429:
             print("Too many requests\n")
+        elif r.status_code == 418:
+            print("I'm a teapot\n")
         response = requests.get(url)
 
         for l in baseURL:
@@ -66,13 +73,15 @@ def scrape():
                 print(output)
                 print("Least Expensive item on the page: $", output[0])
                 print("Most Expensive item on the page: $", output[-1], "\n")
-            elif l in url and response.status_code > 400:
-                print(response.status_code, "Error Page Not Found")
+
 
 
     except:
-        print("Exception thrown. invalid URL.")
+        craigslistURL.delete(0,END)
+        messagebox.showerror("Error","Invalid URL")
 
+def copy():
+    pyperclip.copy(craigslistURL.get())
 
 baseURL = {'https://auburn.craigslist.org', 'https://bham.craigslist.org', 'https://dothan.craigslist.org',
            'https://shoals.craigslist.org', 'https://gadsden.craigslist.org', 'https://huntsville.craigslist.org',
@@ -222,7 +231,7 @@ baseURL = {'https://auburn.craigslist.org', 'https://bham.craigslist.org', 'http
            'https://micronesia.craigslist.org', 'https://puertorico.craigslist.org', 'https://virgin.craigslist.org'}
 
 win = tkinter.Tk()  # creating the main window and storing the window object in 'win'
-win.geometry('500x200')  # setting the size of the window
+win.geometry('500x300')  # setting the size of the window
 win.title('Craigslist Scraper')
 win.configure(bg='#8ed1fc')
 win.eval('tk::PlaceWindow . center')
@@ -234,22 +243,35 @@ label.configure(bg='#8ed1fc')
 craigslistURL = Entry(win, width=50)
 craigslistURL.pack(pady=10)
 
+copy_button = PhotoImage(file='copy.png')
+
 Button(
     win,
-    text="Scrape",
+    text="Scrape",fg='white',
     font=('arial', 10, 'bold'),
     padx=10,
     pady=5,
     command=scrape,
+    cursor="spider",
+    background="black"
 ).pack(pady=5)
 
 Button(
     win,
-    text="Exit",
+    text="Exit", fg='white',
     font=('arial', 10, 'bold'),
     padx=10,
     pady=5,
-    command=close
+    command=close,
+    cursor="pirate",
+    background="black"
+).pack(pady=5)
+
+Button(
+    win,
+    image=copy_button,
+    command=copy,
+    cursor="star"
 ).pack(pady=5)
 
 win.mainloop()
