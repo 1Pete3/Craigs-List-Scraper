@@ -14,12 +14,15 @@ def close():
 def scrape():
     try:
         url = craigslistURL.get()
-        r = requests.get(url,allow_redirects=False)
-        print(r.status_code)
-        if 300 <= r.status_code < 400 :
-            print("Redirected to" ,requests.get(url).url)
+        r = requests.get(url, allow_redirects=False)
+        print("Status code:", r.status_code)
+        if 300 <= r.status_code < 400:
+            print("Redirected to", requests.get(url).url)
+        elif r.status_code == 404:
+            print("Page not found\n")
+        elif r.status_code == 429:
+            print("Too many requests\n")
         response = requests.get(url)
-
 
         for l in baseURL:
             if l in url and "search" in url and response.status_code == 200:
@@ -44,32 +47,31 @@ def scrape():
                 bad_chars = [',', '$', '£', '€']
 
                 # Two lists created, one for storing prices with the $ and , and another without those characters
-                pagePrices = []
-                pagePricesFiltered = []
+                page_prices = []
+                page_prices_filtered = []
                 listings = []
 
                 for x in range(0, endOfListing, 2):
-                    pagePrices.append(price[x].text)
+                    page_prices.append(price[x].text)
 
                 for y in range(0, endOfListing, 2):
-                    carprice = price[y].text
-                    carprice = ''.join(i for i in carprice if not i in bad_chars)
-                    floatCarPrice = float(carprice)
-                    pagePricesFiltered.append(floatCarPrice)
+                    item_price = price[y].text
+                    item_price = ''.join(i for i in item_price if not i in bad_chars)
+                    float_item_price = float(item_price)
+                    page_prices_filtered.append(float_item_price)
 
-                print(pagePrices)
-                pagePricesFiltered.sort()
-                output = ['{:.2f}'.format(elem) for elem in pagePricesFiltered]
+                print(page_prices)
+                page_prices_filtered.sort()
+                output = ['{:.2f}'.format(elem) for elem in page_prices_filtered]
                 print(output)
                 print("Least Expensive item on the page: $", output[0])
                 print("Most Expensive item on the page: $", output[-1], "\n")
-            elif l in url and response.status_code == 404:
+            elif l in url and response.status_code > 400:
                 print(response.status_code, "Error Page Not Found")
 
 
     except:
         print("Exception thrown. invalid URL.")
-
 
 
 baseURL = {'https://auburn.craigslist.org', 'https://bham.craigslist.org', 'https://dothan.craigslist.org',
